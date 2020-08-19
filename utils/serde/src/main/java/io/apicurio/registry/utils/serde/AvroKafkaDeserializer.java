@@ -62,14 +62,12 @@ public class AvroKafkaDeserializer<U> extends AbstractKafkaDeserializer<Schema, 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
         super.configure(configs, isKey);
-
-        Object adp = configs.get(AvroDatumProvider.REGISTRY_AVRO_DATUM_PROVIDER_CONFIG_PARAM);
         encoding = AvroEncoding.fromConfig(configs);
-        //noinspection unchecked,rawtypes
-        Consumer<AvroDatumProvider> consumer =
-            ((Consumer<AvroDatumProvider>) avroDatumProvider -> avroDatumProvider.configure(configs))
-                .andThen(this::setAvroDatumProvider);
+        Object adp = configs.get(AvroDatumProvider.REGISTRY_AVRO_DATUM_PROVIDER_CONFIG_PARAM);
+        //noinspection rawtypes
+        Consumer<AvroDatumProvider> consumer = this::setAvroDatumProvider;
         instantiate(AvroDatumProvider.class, adp, consumer);
+        avroDatumProvider.configure(configs);
     }
 
     @Override
@@ -84,7 +82,7 @@ public class AvroKafkaDeserializer<U> extends AbstractKafkaDeserializer<Schema, 
             if( encoding == AvroEncoding.JSON) {
                 // copy the data into a new byte[]
                 byte[] msgData = new byte[length];
-                System.arraycopy(buffer.array(), start, msgData, 0, length);
+                System.arraycopy(buffer.array(), start, msgData, 0, 17);
                 return reader.read(null, decoderFactory.jsonDecoder(schema, new ByteArrayInputStream(msgData)));
             } else {
                 return reader.read(null, decoderFactory.binaryDecoder(buffer.array(), start, length, null));
