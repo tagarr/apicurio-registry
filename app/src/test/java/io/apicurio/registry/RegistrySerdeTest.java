@@ -47,12 +47,10 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
@@ -216,10 +214,9 @@ public class RegistrySerdeTest extends AbstractResourceTestBase {
         try (AvroKafkaSerializer<GenericData.Record> serializer = new AvroKafkaSerializer<GenericData.Record>(supplier.get());
              Deserializer<GenericData.Record> deserializer = new AvroKafkaDeserializer<>(supplier.get())) {
             HashMap<String, String> config = new HashMap();
-            config.put(AvroEncoding.AVRO_ENCODING, AvroEncoding.AVRO_JSON);
+            config.put(AvroEncoding.AVRO_ENCODING, AvroEncoding.AVRO_JSON );
             serializer.configure(config,false);
             deserializer.configure(config, false);
-
             serializer.setGlobalIdStrategy(new AutoRegisterIdStrategy<>());
 
             GenericData.Record record = new GenericData.Record(schema);
@@ -229,10 +226,6 @@ public class RegistrySerdeTest extends AbstractResourceTestBase {
 
             byte[] bytes = serializer.serialize(subject, record);
 
-            // Test msg is stored as json, take 1st 9 bytes off (magic byte and long)
-            JSONObject msgAsJson = new JSONObject(new String(Arrays.copyOfRange(bytes, 9, bytes.length)));
-            Assertions.assertEquals("somebar", msgAsJson.getString("bar"));
-            
             // some impl details ...
             waitForSchema(supplier.get(), bytes);
 
