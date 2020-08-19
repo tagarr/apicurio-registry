@@ -20,6 +20,7 @@ public enum AvroEncoding {
                 encoding = AvroEncoding.valueOf((String) config.get(AVRO_ENCODING));
             }
             catch (IllegalArgumentException ex){
+                encoding = AvroEncoding.BINARY;
             }
         }
         return encoding;
