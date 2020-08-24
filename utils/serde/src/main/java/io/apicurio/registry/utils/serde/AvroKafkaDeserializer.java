@@ -62,7 +62,7 @@ public class AvroKafkaDeserializer<U> extends AbstractKafkaDeserializer<Schema, 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
         super.configure(configs, isKey);
-
+        encoding = AvroEncoding.fromConfig(configs);
         Object adp = configs.get(AvroDatumProvider.REGISTRY_AVRO_DATUM_PROVIDER_CONFIG_PARAM);
         encoding = AvroEncoding.fromConfig(configs);
         //noinspection unchecked,rawtypes
